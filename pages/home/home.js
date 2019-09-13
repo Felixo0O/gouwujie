@@ -1,4 +1,5 @@
 // pages/home/home.js
+import request from '../../service/network.js'
 Page({
 
   /**
@@ -12,7 +13,12 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-
+      // 1.请求轮播图数据及推荐数据
+      request({
+        url:'http://123.207.32.32:8000/api/v1/home/multidata'
+      }).then(res => {
+        console.log(res)
+      })
   },
 
   /**
