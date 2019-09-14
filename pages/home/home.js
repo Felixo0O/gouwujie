@@ -11,7 +11,13 @@ Page({
    */
   data: {
     banners:[],
-    recommends:[]
+    recommends:[],
+    titles: ['流行', '新款', '精选']
+  },
+  // 监听tabcontrol事件
+  handleTabClick(event) {
+    // 取出index
+    const index = event.detail.index
   },
 
   /**
