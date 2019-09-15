@@ -9,21 +9,13 @@
 		"postcss": true,
 		"minified": true,
 		"newFeature": true,
-		"coverView": true,
 		"autoAudits": false,
-		"checkInvalidKey": true,
-		"checkSiteMap": true,
-		"uploadWithSourceMap": true,
-		"babelSetting": {
-			"ignore": [],
-			"disablePlugins": [],
-			"outputPath": ""
-		}
+		"checkInvalidKey": true
 	},
 	"compileType": "miniprogram",
-	"libVersion": "2.8.2",
+	"libVersion": "2.7.1",
 	"appid": "wxb093b5abc95c4e8a",
-	"projectname": "gouwujie",
+	"projectname": "MiniProgram",
 	"debugOptions": {
 		"hidedInDevtools": []
 	},

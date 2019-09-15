@@ -1,4 +1,4 @@
-// pages/home/childCpns/w-popular/w-polular.js
+// components/w-back-top/w-back-top.js
 Component({
   /**
    * 组件的属性列表
@@ -18,6 +18,10 @@ Component({
    * 组件的方法列表
    */
   methods: {
-
+    handleBackTop() {
+      wx.pageScrollTo({
+        scrollTop: 0,
+      })
+    }
   }
 })
