@@ -16,9 +16,6 @@
   height: 160rpx;
 }
 
-.recommend-item view {
-  font-size: 30rpx;
-  color: #555;
-  margin-top: 10rpx;
+.recommend-item text {
+  font-size: 28rpx;
 }
-

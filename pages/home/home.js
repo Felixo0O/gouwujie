@@ -1,120 +1,140 @@
 // pages/home/home.js
 import {
- getMultiData,
- getGoodsData
+  getMultiData,
+  getProduct
 } from '../../service/home.js'
 
-const TOP_DISTANCE = 1000;
-const types = ['pop', 'new', 'sell']
+import {
+  POP,
+  SELL,
+  NEW,
+  BACK_TOP_POSITION
+} from '../../common/const.js'
 
 Page({
   data: {
     banners: [],
-    recommends: [],
-    titles: ['流行', '新款', '精选'],
+    recommends:[],
+    titles: ["流行", "新款", "精选"],
     goods: {
-      pop: {page: 0, list: []},
-      new: {page: 0, list: []},
-      sell: {page: 0, list: []}
+      [POP]: { page: 1, list: [] },
+      [NEW]: { page: 1, list: [] },
+      [SELL]: { page: 1, list: [] },
     },
     currentType: 'pop',
+    topPosition: 0,
+    tabControlTop: 0,
     showBackTop: false,
-    isTabFixed: false,
-    tabScrollTop: 0
+    showTabControl: false
   },
   onLoad: function (options) {
-    // 1.请求轮播图以及推荐数据
-    this._getMultidata()
-
-    // 2.请求商品数据
-    this._getGoodsData('pop')
-    this._getGoodsData('new')
-    this._getGoodsData('sell')
+    // 1.发送网络请求
+    this._getData()
   },
-  // onShow: 页面显示出来的时回调的函数
-  // 页面显示是否意味着所有的图片都加载完成
-  onShow() {
+  // onReachBottom: function() {
+  //   this._getProductData(this.data.currentType)
+  // },
+  loadMore() {
+    this._getProductData(this.data.currentType);
   },
+  scrollPosition(e) {
+    // 1.获取滚动的顶部
+    const position = e.detail.scrollTop;
 
-  // ------------------- 网络请求函数 -------------------------
-  _getMultidata() {
-    getMultiData().then(res => {
-      // 取出轮播图和推荐的数据
-      const banners = res.data.data.banner.list;
-      const recommends = res.data.data.recommend.list;
-
-      // 将banners和recommends放到data中
-      this.setData({
-        banners,
-        recommends
-      })
-    })
-  },
-  _getGoodsData(type) {
-    // 1.获取页码
-    const page = this.data.goods[type].page + 1;
-
-    // 2.发送网络请求
-    getGoodsData(type, page).then(res => {
-      // console.log(res)
-      // 2.1.取出数据
-      const list = res.data.data.list;
-
-      // 2.2.将数据设置到对应type的list中
-      const oldList = this.data.goods[type].list;
-      oldList.push(...list)
-
-      // 2.3.将数据设置到data中的goods中
-      const typeKey = `goods.${type}.list`;
-      const pageKey = `goods.${type}.page`;
-      this.setData({
-        [typeKey]: oldList,
-        [pageKey]: page
-      })
-    })
-  },
-
-  // ------------------- 事件监听函数 -------------------------
-  handleTabClick(event) {
-    // 取出index
-    const index = event.detail.index;
-
-    // 设置currentType
+    // 2.设置是否显示
     this.setData({
-      currentType: types[index]
+      showBackTop: position > BACK_TOP_POSITION,
     })
-  },
-  handleImageLoad() {
-    wx.createSelectorQuery().select('#tab-control').boundingClientRect(rect => {
-      this.data.tabScrollTop = rect.top
+
+    wx.createSelectorQuery().select('.tab-control').boundingClientRect((rect) => {
+      const show = rect.top > 0
+      this.setData({
+        showTabControl: !show
+      })
     }).exec()
   },
-
-  onReachBottom() {
-    // 上拉加载更多 -> 请求新的数据
-    this._getGoodsData(this.data.currentType)
+  onImageLoad() {
+    wx.createSelectorQuery().select('.tab-control').boundingClientRect((rect) => {
+      this.setData({
+        tabControlTop: rect.top
+      })
+    }).exec()
+  },
+  onPageScroll(res) {
+  },
+  tabClick(e) {
+    // 1.根据当前的点击赋值最新的currentType
+    let currentType = ''
+    switch(e.detail.index) {
+      case 0:
+        currentType = POP
+        break
+      case 1:
+        currentType = NEW
+        break
+      case 2:
+        currentType = SELL
+        break
+    }
+    this.setData({
+      currentType: currentType
+    })
+    console.log(this.selectComponent('.tab-control'));
+    this.selectComponent('.tab-control').setCurrentIndex(e.detail.index)
+    this.selectComponent('.tab-control-temp').setCurrentIndex(e.detail.index)
   },
 
-  onPageScroll(options) {
-    // 1.取出scrollTop
-    const scrollTop = options.scrollTop;
-    // console.log(scrollTop)
+  onBackTop() {
+    // wx.pageScrollTo({
+    //   scrollTop: 0,
+    //   duration: 0
+    // })
+    this.setData({
+      showBackTop: false,
+      topPosition: 0,
+      tabControlTop: 0
+    })
+  },
 
-    // 2.修改showBackTop属性
-    // 官方: 不要再滚动的函数回调中频繁的调用this.setData
-    const flag1 = scrollTop >= TOP_DISTANCE;
-    if (flag1 != this.data.showBackTop) {
-      this.setData({
-        showBackTop: flag1
+  // 网络请求相关方法
+  _getData() {
+    this._getMultiData(); // 获取上面的数据
+    this._getProductData(POP);
+    this._getProductData(NEW);
+    this._getProductData(SELL);
+  },
+  _getMultiData() {
+    getMultiData().then(res => {
+      // 1.取出轮播所有的数据
+      const banners = res.data.banner.list.map(item => {
+        return item.image
       })
-    }
 
-    // 3.修改isTabFixed属性
-    const flag2 = scrollTop >= this.data.tabScrollTop;
-    if (flag2 != this.data.isTabFixed) {
+      // 2.设置数据
       this.setData({
-        isTabFixed: flag2
+        banners: banners,
+        recommends: res.data.recommend.list
       })
-    }
+    })
+  },
+  _getProductData(type) {
+    // 1.获取数据对应的页码
+    const page = this.data.goods[type].page;
+
+    // 2.请求数据
+    getProduct(type, page).then(res => {
+      // 1.取出数据
+      const list = res.data.list;
+
+      // 2.将数据临时获取
+      const goods = this.data.goods;
+      goods[type].list.push(...list)
+      goods[type].page += 1;
+
+      // 3.最新的goods设置到goods中
+      this.setData({
+        goods: goods
+      })
+    })
   }
 })

@@ -1,4 +1,4 @@
-// pages/home/childCpns/w-popular/w-polular.js
+// pages/profile/childCpns/w-info/w-info.js
 Component({
   /**
    * 组件的属性列表

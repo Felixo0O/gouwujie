@@ -4,11 +4,11 @@ export function getMultiData() {
   return request({
     url: '/api/v1/home/multidata'
   })
-}
+} 
 
-export function getGoodsData(type, page) {
+export function getProduct(type, page) {
   return request({
-    url: '/home/data',
+    url: '/api/v1/home/data',
     data: {
       type,
       page
